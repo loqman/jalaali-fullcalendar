@@ -145,7 +145,6 @@ var DayGrid = Grid.extend({
 
 		this.updateCellDates(); // populates cellDates and dayToCellOffsets
 		cellDates = this.cellDates;
-
 		if (this.breakOnWeeks) {
 			// count columns until the day-of-week repeats
 			firstDay = cellDates[0].day();
@@ -163,6 +162,7 @@ var DayGrid = Grid.extend({
 
 		this.rowCnt = rowCnt;
 		this.colCnt = colCnt;
+
 	},
 
 
@@ -173,7 +173,6 @@ var DayGrid = Grid.extend({
 		var dates = [];
 		var offset = -1;
 		var offsets = [];
-
 		while (date.isBefore(this.end)) { // loop each day from start to end
 			if (view.isHiddenDay(date)) {
 				offsets.push(offset + 0.5); // mark that it's between offsets
@@ -185,7 +184,6 @@ var DayGrid = Grid.extend({
 			}
 			date.add(1, 'days');
 		}
-
 		this.cellDates = dates;
 		this.dayToCellOffsets = offsets;
 	},
@@ -195,7 +193,7 @@ var DayGrid = Grid.extend({
 	computeCellDate: function(cell) {
 		var colCnt = this.colCnt;
 		var index = cell.row * colCnt + (this.isRTL ? colCnt - cell.col - 1 : cell.col);
-
+        window.cellDates = this.cellDates;
 		return this.cellDates[index].clone();
 	},
 

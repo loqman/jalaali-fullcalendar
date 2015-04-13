@@ -104,7 +104,7 @@ function massageOverrides(input) {
 				$.each(val, function(subName, subVal) {
 
 					// is the property targeting a view?
-					if (/^(month|week|day|default|basic(Week|Day)?|agenda(Week|Day)?)$/.test(subName)) {
+					if (/^(month|jMonth|week|day|default|basic(Week|Day)?|agenda(Week|Day)?)$/.test(subName)) {
 						if (!overrides.views[subName]) { // ensure the view-target entry exists
 							overrides.views[subName] = {};
 						}

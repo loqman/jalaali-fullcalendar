@@ -86,8 +86,8 @@ var dpComputableOptions = {
 	// Produces format strings like "MMMM YYYY" -> "September 2014"
 	monthYearFormat: function(dpOptions) {
 		return dpOptions.showMonthAfterYear ?
-			'YYYY[' + dpOptions.yearSuffix + '] MMMM' :
-			'MMMM YYYY[' + dpOptions.yearSuffix + ']';
+			'jYYYY[' + dpOptions.yearSuffix + '] jMMMM' :
+			'jMMMM jYYYY[' + dpOptions.yearSuffix + ']';
 	}
 
 };

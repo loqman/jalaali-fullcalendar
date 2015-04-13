@@ -85,7 +85,6 @@ function formatRange(date1, date2, formatStr, separator, isRTL) {
 	// or non-zero areas in Moment's localized format strings.
 
 	separator = separator || ' - ';
-
 	return formatRangeWithChunks(
 		date1,
 		date2,
@@ -175,8 +174,12 @@ function formatSimilarChunk(date1, date2, chunk) {
 		return chunk;
 	}
 	else if ((token = chunk.token)) {
-		unit = similarUnitMap[token.charAt(0)];
-		// are the dates the same for this unit of measurement?
+        if (token.charAt(0) === 'j') {
+            unit = similarUnitMap[token.charAt(1)];
+        } else {
+            unit = similarUnitMap[token.charAt(0)];
+        }
+   		// are the dates the same for this unit of measurement?
 		if (unit && date1.isSame(date2, unit)) {
 			return oldMomentFormat(date1, token); // would be the same if we used `date2`
 			// BTW, don't support custom tokens
@@ -196,9 +199,9 @@ var formatStringChunkCache = {};
 
 
 function getFormatStringChunks(formatStr) {
-	if (formatStr in formatStringChunkCache) {
+	/* if (formatStr in formatStringChunkCache) {
 		return formatStringChunkCache[formatStr];
-	}
+	}*/
 	return (formatStringChunkCache[formatStr] = chunkFormatString(formatStr));
 }
 
@@ -206,9 +209,9 @@ function getFormatStringChunks(formatStr) {
 // Break the formatting string into an array of chunks
 function chunkFormatString(formatStr) {
 	var chunks = [];
-	var chunker = /\[([^\]]*)\]|\(([^\)]*)\)|(LTS|LT|(\w)\4*o?)|([^\w\[\(]+)/g; // TODO: more descrimination
+	var chunker = /\[([^\]]*)\]|\(([^\)]*)\)|(LTS|LT|j*(\w)\4*o?)|([^\w\[\(]+)/g; // TODO: more descrimination
 	var match;
-
+    console.log(formatStr);
 	while ((match = chunker.exec(formatStr))) {
 		if (match[1]) { // a literal string inside [ ... ]
 			chunks.push(match[1]);

@@ -3,6 +3,7 @@ Calendar.defaults = {
 
 	titleRangeSeparator: ' \u2014 ', // emphasized dash
 	monthYearFormat: 'MMMM YYYY', // required for en. other languages rely on datepicker computable option
+    jMonthYearFormat: 'jMMMM jYYYY',
 
 	defaultTimedEventDuration: '02:00:00',
 	defaultAllDayEventDuration: { days: 1 },

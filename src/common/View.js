@@ -112,12 +112,15 @@ var View = fc.View = Class.extend({
 	// Subclasses can override. Must return all properties.
 	computeRange: function(date) {
 		var intervalUnit = computeIntervalUnit(this.intervalDuration);
+        if (this.opt('isRTL') && (intervalUnit === "year" || intervalUnit === "month")) {
+            intervalUnit = 'j' + intervalUnit.charAt(0).toUpperCase() + intervalUnit.slice(1);
+        }
 		var intervalStart = date.clone().startOf(intervalUnit);
 		var intervalEnd = intervalStart.clone().add(this.intervalDuration);
 		var start, end;
 
 		// normalize the range's time-ambiguity
-		if (/year|month|week|day/.test(intervalUnit)) { // whole-days?
+		if (/year|month|week|day|jYear|jMonth/.test(intervalUnit)) { // whole-days?
 			intervalStart.stripTime();
 			intervalEnd.stripTime();
 		}
@@ -199,13 +202,15 @@ var View = fc.View = Class.extend({
 	// Generates the format string that should be used to generate the title for the current date range.
 	// Attempts to compute the most appropriate format if not explicitly specified with `titleFormat`.
 	computeTitleFormat: function() {
-		if (this.intervalUnit == 'year') {
+        if (this.intervalUnit == 'year') {
 			return 'YYYY';
-		}
-		else if (this.intervalUnit == 'month') {
+		} else if (this.intervalUnit == 'jYear') {
+            return 'jYYYY';
+        } else if (this.intervalUnit == 'month') {
 			return this.opt('monthYearFormat'); // like "September 2014"
-		}
-		else if (this.intervalDuration.as('days') > 1) {
+		} else if (this.intervalUnit == 'jMonth') {
+            return this.opt('jMonthYearFormat')
+        } else if (this.intervalDuration.as('days') > 1) {
 			return 'll'; // multi-day range. shorter, like "Sep 9 - 10 2014"
 		}
 		else {

@@ -84,7 +84,6 @@ var Grid = fc.Grid = RowRenderer.extend({
 
 		this.start = range.start.clone();
 		this.end = range.end.clone();
-
 		this.rowData = [];
 		this.colData = [];
 		this.updateCells();
@@ -626,9 +625,8 @@ var Grid = fc.Grid = RowRenderer.extend({
 		var classes = this.getDayClasses(date);
 
 		classes.unshift('fc-day', view.widgetContentClass);
-
 		return '<td class="' + classes.join(' ') + '"' +
-			' data-date="' + date.format('YYYY-MM-DD') + '"' + // if date has a time, won't format it
+			' data-date="' + date.format('YYYY-MM-DD').toLatin() + '"' + // if date has a time, won't format it
 			'></td>';
 	},
 

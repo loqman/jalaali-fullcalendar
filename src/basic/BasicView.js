@@ -26,7 +26,7 @@ var BasicView = fcViews.basic = View.extend({
 	setRange: function(range) {
 		View.prototype.setRange.call(this, range); // call the super-method
 
-		this.dayGrid.breakOnWeeks = /year|month|week/.test(this.intervalUnit); // do before setRange
+		this.dayGrid.breakOnWeeks = /year|month|week|jYear|jMonth/.test(this.intervalUnit); // do before setRange
 		this.dayGrid.setRange(range);
 	},
 
@@ -36,7 +36,7 @@ var BasicView = fcViews.basic = View.extend({
 		var range = View.prototype.computeRange.call(this, date); // get value from the super-method
 
 		// year and month views should be aligned with weeks. this is already done for week
-		if (/year|month/.test(range.intervalUnit)) {
+		if (/year|month|jYear|jMonth/.test(range.intervalUnit)) {
 			range.start.startOf('week');
 			range.start = this.skipHiddenDays(range.start);
 

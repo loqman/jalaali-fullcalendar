@@ -641,3 +641,18 @@ function debounce(func, wait) {
 		}
 	};
 }
+
+String.prototype.toLatin = function() {
+    var $this, farsiNumbers, latinNumbers, matches, str;
+    $this = this;
+    latinNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    farsiNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    matches = $this.match(/[\u06F0-\u06F9]/g);
+    str = $this;
+    if (matches) {
+        matches.forEach(function(m) {
+            return str = str.replace(m, latinNumbers[farsiNumbers.indexOf(m)]);
+        });
+    }
+    return str.toLowerCase();
+};
