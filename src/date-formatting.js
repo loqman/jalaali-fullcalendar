@@ -135,13 +135,16 @@ function formatRangeWithChunks(date1, date2, chunks, separator, isRTL) {
 
 	if (middleStr1 || middleStr2) {
 		if (isRTL) {
-			middleStr = middleStr2 + separator + middleStr1;
+            if (middleStr1 == middleStr2) {
+                middleStr = middleStr1;
+            } else {
+                middleStr = middleStr1 + separator + middleStr2;
+            }
 		}
 		else {
 			middleStr = middleStr1 + separator + middleStr2;
 		}
 	}
-
 	return leftStr + middleStr + rightStr;
 }
 
@@ -211,7 +214,6 @@ function chunkFormatString(formatStr) {
 	var chunks = [];
 	var chunker = /\[([^\]]*)\]|\(([^\)]*)\)|(LTS|LT|j*(\w)\4*o?)|([^\w\[\(]+)/g; // TODO: more descrimination
 	var match;
-    console.log(formatStr);
 	while ((match = chunker.exec(formatStr))) {
 		if (match[1]) { // a literal string inside [ ... ]
 			chunks.push(match[1]);
