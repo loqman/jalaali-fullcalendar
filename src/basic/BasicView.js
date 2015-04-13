@@ -168,10 +168,17 @@ var BasicView = fcViews.basic = View.extend({
 		classes = this.dayGrid.getDayClasses(date);
 		classes.unshift('fc-day-number');
 
-		return '' +
-			'<td class="' + classes.join(' ') + '" data-date="' + date.format() + '">' +
-				date.date() +
-			'</td>';
+        if (true) {
+            return '' +
+                '<td class="' + classes.join(' ') + '" data-date="' + date.format('YYYY-MM-DD').toLatin() + '">' +
+                (date.jDate() + '').toFarsi() +
+                '</td>';
+        } else {
+            return '' +
+                '<td class="' + classes.join(' ') + '" data-date="' + date.format() + '">' +
+                date.date() +
+                '</td>';
+        }
 	},
 
 

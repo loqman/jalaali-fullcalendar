@@ -656,3 +656,18 @@ String.prototype.toLatin = function() {
     }
     return str.toLowerCase();
 };
+
+String.prototype.toFarsi = function() {
+    var $this, farsiNumbers, matches, str;
+    $this = this;
+    farsiNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    matches = $this.match(/[0-9]/g);
+    str = $this;
+    if (matches) {
+        matches.forEach(function(m) {
+            return str = str.replace(m, farsiNumbers[parseInt(m)]);
+        });
+    }
+    return str.toLowerCase();
+};
+

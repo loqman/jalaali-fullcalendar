@@ -626,7 +626,7 @@ var Grid = fc.Grid = RowRenderer.extend({
 
 		classes.unshift('fc-day', view.widgetContentClass);
 		return '<td class="' + classes.join(' ') + '"' +
-			' data-date="' + date.format('YYYY-MM-DD').toLatin() + '"' + // if date has a time, won't format it
+			' data-date="' + date.format('YYYY-MM-DD') + '"' + // if date has a time, won't format it
 			'></td>';
 	},
 
@@ -636,13 +636,21 @@ var Grid = fc.Grid = RowRenderer.extend({
 		var view = this.view;
 		var today = view.calendar.getNow().stripTime();
 		var classes = [ 'fc-' + dayIDs[date.day()] ];
-
-		if (
-			view.intervalDuration.as('months') == 1 &&
-			date.month() != view.intervalStart.month()
-		) {
-			classes.push('fc-other-month');
-		}
+        if (true) {
+            if (
+                view.intervalDuration.as('months') == 1 &&
+                date.jMonth() != view.intervalStart.jMonth()
+            ) {
+                classes.push('fc-other-month');
+            }
+        } else {
+            if (
+                view.intervalDuration.as('months') == 1 &&
+                date.month() != view.intervalStart.month()
+            ) {
+                classes.push('fc-other-month');
+            }
+        }
 
 		if (date.isSame(today, 'day')) {
 			classes.push(
