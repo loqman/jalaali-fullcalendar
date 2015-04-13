@@ -749,7 +749,7 @@ function Calendar_constructor(element, overrides) {
 	
 	function next() {
 		date = currentView.computeNextDate(date);
-		renderView();
+        renderView();
 	}
 	
 	

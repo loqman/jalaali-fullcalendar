@@ -150,17 +150,30 @@ var View = fc.View = Class.extend({
 
 	// Computes the new date when the user hits the prev button, given the current date
 	computePrevDate: function(date) {
-		return this.massageCurrentDate(
-			date.clone().startOf(this.intervalUnit).subtract(this.intervalDuration), -1
-		);
+        if (this.opt('isRTL')) {
+            return this.massageCurrentDate(
+                date.clone().startOf(this.intervalUnit).add(8, 'day').subtract(1, 'jMonth'), -1
+            );
+        } else {
+            return this.massageCurrentDate(
+                date.clone().startOf(this.intervalUnit).subtract(this.intervalDuration), -1
+            );
+        }
 	},
 
 
 	// Computes the new date when the user hits the next button, given the current date
 	computeNextDate: function(date) {
-		return this.massageCurrentDate(
-			date.clone().startOf(this.intervalUnit).add(this.intervalDuration)
-		);
+        window.date = date;
+        if (this.opt('isRTL')) {
+            return this.massageCurrentDate(
+                date.clone().startOf(this.intervalUnit).add(8, 'day').add(1, 'jMonth')
+            );
+        } else {
+            return this.massageCurrentDate(
+                date.clone().startOf(this.intervalUnit).add(this.intervalDuration)
+            );
+        }
 	},
 
 
