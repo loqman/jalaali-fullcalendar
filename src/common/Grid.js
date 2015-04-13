@@ -636,7 +636,7 @@ var Grid = fc.Grid = RowRenderer.extend({
 		var view = this.view;
 		var today = view.calendar.getNow().stripTime();
 		var classes = [ 'fc-' + dayIDs[date.day()] ];
-        if (true) {
+        if (this.view.opt('isRTL')) {
             if (
                 view.intervalDuration.as('months') == 1 &&
                 date.jMonth() != view.intervalStart.jMonth()

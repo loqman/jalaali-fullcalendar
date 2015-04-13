@@ -168,7 +168,7 @@ var BasicView = fcViews.basic = View.extend({
 		classes = this.dayGrid.getDayClasses(date);
 		classes.unshift('fc-day-number');
 
-        if (true) {
+        if (this.opt('isRTL')) {
             return '' +
                 '<td class="' + classes.join(' ') + '" data-date="' + date.format('YYYY-MM-DD').toLatin() + '">' +
                 (date.jDate() + '').toFarsi() +
