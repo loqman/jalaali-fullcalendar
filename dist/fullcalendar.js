@@ -1,6 +1,6 @@
 /*!
- * FullCalendar v2.3.1
- * Docs & License: http://fullcalendar.io/
+ * Jalaali FullCalendar v2.3.6
+ * Docs & License: http://fullcalendar.ir/
  * (c) 2015 Adam Shaw
  */
 
@@ -18,7 +18,7 @@
 
 ;;
 
-var fc = $.fullCalendar = { version: "2.3.1" };
+var fc = $.fullCalendar = { version: "2.3.6" };
 var fcViews = fc.views = {};
 
 
@@ -123,7 +123,7 @@ function massageOverrides(input) {
 				$.each(val, function(subName, subVal) {
 
 					// is the property targeting a view?
-					if (/^(month|week|day|default|basic(Week|Day)?|agenda(Week|Day)?)$/.test(subName)) {
+					if (/^(month|jMonth|week|day|default|basic(Week|Day)?|agenda(Week|Day)?)$/.test(subName)) {
 						if (!overrides.views[subName]) { // ensure the view-target entry exists
 							overrides.views[subName] = {};
 						}
@@ -795,6 +795,36 @@ function debounce(func, wait) {
 	};
 }
 
+String.prototype.toLatin = function() {
+    var $this, farsiNumbers, latinNumbers, matches, str;
+    $this = this;
+    latinNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    farsiNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    matches = $this.match(/[\u06F0-\u06F9]/g);
+    str = $this;
+    if (matches) {
+        matches.forEach(function(m) {
+            return str.replace(m, latinNumbers[farsiNumbers.indexOf(m)]);
+        });
+    }
+    return str.toLowerCase();
+};
+
+String.prototype.toFarsi = function() {
+    var $this, farsiNumbers, matches, str;
+    $this = this;
+    farsiNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    matches = $this.match(/[0-9]/g);
+    str = $this;
+    if (matches) {
+        matches.forEach(function(m) {
+            return str.replace(m, farsiNumbers[parseInt(m)]);
+        });
+    }
+    return str.toLowerCase();
+};
+
+
 ;;
 
 var ambigDateOfMonthRegex = /^\s*\d{4}-\d\d$/;
@@ -1388,7 +1418,6 @@ function formatRange(date1, date2, formatStr, separator, isRTL) {
 	// or non-zero areas in Moment's localized format strings.
 
 	separator = separator || ' - ';
-
 	return formatRangeWithChunks(
 		date1,
 		date2,
@@ -1439,13 +1468,16 @@ function formatRangeWithChunks(date1, date2, chunks, separator, isRTL) {
 
 	if (middleStr1 || middleStr2) {
 		if (isRTL) {
-			middleStr = middleStr2 + separator + middleStr1;
+            if (middleStr1 == middleStr2) {
+                middleStr = middleStr1;
+            } else {
+                middleStr = middleStr1 + separator + middleStr2;
+            }
 		}
 		else {
 			middleStr = middleStr1 + separator + middleStr2;
 		}
 	}
-
 	return leftStr + middleStr + rightStr;
 }
 
@@ -1478,8 +1510,12 @@ function formatSimilarChunk(date1, date2, chunk) {
 		return chunk;
 	}
 	else if ((token = chunk.token)) {
-		unit = similarUnitMap[token.charAt(0)];
-		// are the dates the same for this unit of measurement?
+        if (token.charAt(0) === 'j') {
+            unit = similarUnitMap[token.charAt(1)];
+        } else {
+            unit = similarUnitMap[token.charAt(0)];
+        }
+        // are the dates the same for this unit of measurement?
 		if (unit && date1.isSame(date2, unit)) {
 			return oldMomentFormat(date1, token); // would be the same if we used `date2`
 			// BTW, don't support custom tokens
@@ -1499,9 +1535,9 @@ var formatStringChunkCache = {};
 
 
 function getFormatStringChunks(formatStr) {
-	if (formatStr in formatStringChunkCache) {
+	/* if (formatStr in formatStringChunkCache) {
 		return formatStringChunkCache[formatStr];
-	}
+	}*/
 	return (formatStringChunkCache[formatStr] = chunkFormatString(formatStr));
 }
 
@@ -1509,9 +1545,8 @@ function getFormatStringChunks(formatStr) {
 // Break the formatting string into an array of chunks
 function chunkFormatString(formatStr) {
 	var chunks = [];
-	var chunker = /\[([^\]]*)\]|\(([^\)]*)\)|(LTS|LT|(\w)\4*o?)|([^\w\[\(]+)/g; // TODO: more descrimination
+	var chunker = /\[([^\]]*)\]|\(([^\)]*)\)|(LTS|LT|j*(\w)\4*o?)|([^\w\[\(]+)/g; // TODO: more descrimination
 	var match;
-
 	while ((match = chunker.exec(formatStr))) {
 		if (match[1]) { // a literal string inside [ ... ]
 			chunks.push(match[1]);
@@ -2862,7 +2897,6 @@ var Grid = fc.Grid = RowRenderer.extend({
 
 		this.start = range.start.clone();
 		this.end = range.end.clone();
-
 		this.rowData = [];
 		this.colData = [];
 		this.updateCells();
@@ -3404,7 +3438,6 @@ var Grid = fc.Grid = RowRenderer.extend({
 		var classes = this.getDayClasses(date);
 
 		classes.unshift('fc-day', view.widgetContentClass);
-
 		return '<td class="' + classes.join(' ') + '"' +
 			' data-date="' + date.format('YYYY-MM-DD') + '"' + // if date has a time, won't format it
 			'></td>';
@@ -3416,13 +3449,21 @@ var Grid = fc.Grid = RowRenderer.extend({
 		var view = this.view;
 		var today = view.calendar.getNow().stripTime();
 		var classes = [ 'fc-' + dayIDs[date.day()] ];
-
-		if (
-			view.intervalDuration.as('months') == 1 &&
-			date.month() != view.intervalStart.month()
-		) {
-			classes.push('fc-other-month');
-		}
+        if (this.view.opt('isRTL')) {
+            if (
+                view.intervalDuration.as('months') == 1 &&
+                date.jMonth() != view.intervalStart.jMonth()
+            ) {
+                classes.push('fc-other-month');
+            }
+        } else {
+            if (
+                view.intervalDuration.as('months') == 1 &&
+                date.month() != view.intervalStart.month()
+            ) {
+                classes.push('fc-other-month');
+            }
+        }
 
 		if (date.isSame(today, 'day')) {
 			classes.push(
@@ -4607,7 +4648,6 @@ var DayGrid = Grid.extend({
 
 		this.updateCellDates(); // populates cellDates and dayToCellOffsets
 		cellDates = this.cellDates;
-
 		if (this.breakOnWeeks) {
 			// count columns until the day-of-week repeats
 			firstDay = cellDates[0].day();
@@ -4625,6 +4665,7 @@ var DayGrid = Grid.extend({
 
 		this.rowCnt = rowCnt;
 		this.colCnt = colCnt;
+
 	},
 
 
@@ -4635,7 +4676,6 @@ var DayGrid = Grid.extend({
 		var dates = [];
 		var offset = -1;
 		var offsets = [];
-
 		while (date.isBefore(this.end)) { // loop each day from start to end
 			if (view.isHiddenDay(date)) {
 				offsets.push(offset + 0.5); // mark that it's between offsets
@@ -4647,7 +4687,6 @@ var DayGrid = Grid.extend({
 			}
 			date.add(1, 'days');
 		}
-
 		this.cellDates = dates;
 		this.dayToCellOffsets = offsets;
 	},
@@ -4657,7 +4696,7 @@ var DayGrid = Grid.extend({
 	computeCellDate: function(cell) {
 		var colCnt = this.colCnt;
 		var index = cell.row * colCnt + (this.isRTL ? colCnt - cell.col - 1 : cell.col);
-
+        window.cellDates = this.cellDates;
 		return this.cellDates[index].clone();
 	},
 
@@ -6656,12 +6695,15 @@ var View = fc.View = Class.extend({
 	// Subclasses can override. Must return all properties.
 	computeRange: function(date) {
 		var intervalUnit = computeIntervalUnit(this.intervalDuration);
+        if (this.opt('isRTL') && (intervalUnit === "year" || intervalUnit === "month")) {
+            intervalUnit = 'j' + intervalUnit.charAt(0).toUpperCase() + intervalUnit.slice(1);
+        }
 		var intervalStart = date.clone().startOf(intervalUnit);
 		var intervalEnd = intervalStart.clone().add(this.intervalDuration);
 		var start, end;
 
 		// normalize the range's time-ambiguity
-		if (/year|month|week|day/.test(intervalUnit)) { // whole-days?
+		if (/year|month|week|day|jYear|jMonth/.test(intervalUnit)) { // whole-days?
 			intervalStart.stripTime();
 			intervalEnd.stripTime();
 		}
@@ -6691,17 +6733,30 @@ var View = fc.View = Class.extend({
 
 	// Computes the new date when the user hits the prev button, given the current date
 	computePrevDate: function(date) {
-		return this.massageCurrentDate(
-			date.clone().startOf(this.intervalUnit).subtract(this.intervalDuration), -1
-		);
+        if (this.opt('isRTL')) {
+            return this.massageCurrentDate(
+                date.clone().startOf(this.intervalUnit).add(8, 'day').subtract(1, 'jMonth'), -1
+            );
+        } else {
+            return this.massageCurrentDate(
+                date.clone().startOf(this.intervalUnit).subtract(this.intervalDuration), -1
+            );
+        }
 	},
 
 
 	// Computes the new date when the user hits the next button, given the current date
 	computeNextDate: function(date) {
-		return this.massageCurrentDate(
-			date.clone().startOf(this.intervalUnit).add(this.intervalDuration)
-		);
+        window.date = date;
+        if (this.opt('isRTL')) {
+            return this.massageCurrentDate(
+                date.clone().startOf(this.intervalUnit).add(8, 'day').add(1, 'jMonth')
+            );
+        } else {
+            return this.massageCurrentDate(
+                date.clone().startOf(this.intervalUnit).add(this.intervalDuration)
+            );
+        }
 	},
 
 
@@ -6743,13 +6798,15 @@ var View = fc.View = Class.extend({
 	// Generates the format string that should be used to generate the title for the current date range.
 	// Attempts to compute the most appropriate format if not explicitly specified with `titleFormat`.
 	computeTitleFormat: function() {
-		if (this.intervalUnit == 'year') {
+        if (this.intervalUnit == 'year') {
 			return 'YYYY';
-		}
-		else if (this.intervalUnit == 'month') {
+		} else if (this.intervalUnit == 'jYear') {
+            return 'jYYYY';
+        } else if (this.intervalUnit == 'month') {
 			return this.opt('monthYearFormat'); // like "September 2014"
-		}
-		else if (this.intervalDuration.as('days') > 1) {
+		} else if (this.intervalUnit == 'jMonth') {
+            return this.opt('jMonthYearFormat');
+        } else if (this.intervalDuration.as('days') > 1) {
 			return 'll'; // multi-day range. shorter, like "Sep 9 - 10 2014"
 		}
 		else {
@@ -8193,7 +8250,7 @@ function Calendar_constructor(element, overrides) {
 	
 	function next() {
 		date = currentView.computeNextDate(date);
-		renderView();
+        renderView();
 	}
 	
 	
@@ -8312,6 +8369,7 @@ Calendar.defaults = {
 
 	titleRangeSeparator: ' \u2014 ', // emphasized dash
 	monthYearFormat: 'MMMM YYYY', // required for en. other languages rely on datepicker computable option
+    jMonthYearFormat: 'jMMMM jYYYY',
 
 	defaultTimedEventDuration: '02:00:00',
 	defaultAllDayEventDuration: { days: 1 },
@@ -8509,8 +8567,8 @@ var dpComputableOptions = {
 	// Produces format strings like "MMMM YYYY" -> "September 2014"
 	monthYearFormat: function(dpOptions) {
 		return dpOptions.showMonthAfterYear ?
-			'YYYY[' + dpOptions.yearSuffix + '] MMMM' :
-			'MMMM YYYY[' + dpOptions.yearSuffix + ']';
+			'jYYYY[' + dpOptions.yearSuffix + '] jMMMM' :
+			'jMMMM jYYYY[' + dpOptions.yearSuffix + ']';
 	}
 
 };
@@ -10013,7 +10071,7 @@ var BasicView = fcViews.basic = View.extend({
 	setRange: function(range) {
 		View.prototype.setRange.call(this, range); // call the super-method
 
-		this.dayGrid.breakOnWeeks = /year|month|week/.test(this.intervalUnit); // do before setRange
+		this.dayGrid.breakOnWeeks = /year|month|week|jYear|jMonth/.test(this.intervalUnit); // do before setRange
 		this.dayGrid.setRange(range);
 	},
 
@@ -10023,7 +10081,7 @@ var BasicView = fcViews.basic = View.extend({
 		var range = View.prototype.computeRange.call(this, date); // get value from the super-method
 
 		// year and month views should be aligned with weeks. this is already done for week
-		if (/year|month/.test(range.intervalUnit)) {
+		if (/year|month|jYear|jMonth/.test(range.intervalUnit)) {
 			range.start.startOf('week');
 			range.start = this.skipHiddenDays(range.start);
 
@@ -10155,10 +10213,17 @@ var BasicView = fcViews.basic = View.extend({
 		classes = this.dayGrid.getDayClasses(date);
 		classes.unshift('fc-day-number');
 
-		return '' +
-			'<td class="' + classes.join(' ') + '" data-date="' + date.format() + '">' +
-				date.date() +
-			'</td>';
+        if (this.opt('isRTL')) {
+            return '' +
+                '<td class="' + classes.join(' ') + '" data-date="' + date.format('YYYY-MM-DD').toLatin() + '">' +
+                (date.jDate() + '').toFarsi() +
+                '</td>';
+        } else {
+            return '' +
+                '<td class="' + classes.join(' ') + '" data-date="' + date.format() + '">' +
+                date.date() +
+                '</td>';
+        }
 	},
 
 
