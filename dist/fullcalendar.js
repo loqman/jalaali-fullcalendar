@@ -1,5 +1,5 @@
 /*!
- * Jalaali FullCalendar v2.3.6
+ * Jalaali FullCalendar v2.3.8
  * Docs & License: http://fullcalendar.ir/
  * (c) 2015 Adam Shaw
  */
@@ -18,7 +18,7 @@
 
 ;;
 
-var fc = $.fullCalendar = { version: "2.3.6" };
+var fc = $.fullCalendar = { version: "2.3.8" };
 var fcViews = fc.views = {};
 
 
@@ -804,7 +804,7 @@ String.prototype.toLatin = function() {
     str = $this;
     if (matches) {
         matches.forEach(function(m) {
-            return str.replace(m, latinNumbers[farsiNumbers.indexOf(m)]);
+            str = str.replace(m, latinNumbers[farsiNumbers.indexOf(m)]);
         });
     }
     return str.toLowerCase();
@@ -818,7 +818,7 @@ String.prototype.toFarsi = function() {
     str = $this;
     if (matches) {
         matches.forEach(function(m) {
-            return str.replace(m, farsiNumbers[parseInt(m)]);
+            str = str.replace(m, farsiNumbers[parseInt(m)]);
         });
     }
     return str.toLowerCase();
