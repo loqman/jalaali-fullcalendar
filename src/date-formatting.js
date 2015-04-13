@@ -182,7 +182,7 @@ function formatSimilarChunk(date1, date2, chunk) {
         } else {
             unit = similarUnitMap[token.charAt(0)];
         }
-   		// are the dates the same for this unit of measurement?
+        // are the dates the same for this unit of measurement?
 		if (unit && date1.isSame(date2, unit)) {
 			return oldMomentFormat(date1, token); // would be the same if we used `date2`
 			// BTW, don't support custom tokens

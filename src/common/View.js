@@ -222,7 +222,7 @@ var View = fc.View = Class.extend({
         } else if (this.intervalUnit == 'month') {
 			return this.opt('monthYearFormat'); // like "September 2014"
 		} else if (this.intervalUnit == 'jMonth') {
-            return this.opt('jMonthYearFormat')
+            return this.opt('jMonthYearFormat');
         } else if (this.intervalDuration.as('days') > 1) {
 			return 'll'; // multi-day range. shorter, like "Sep 9 - 10 2014"
 		}

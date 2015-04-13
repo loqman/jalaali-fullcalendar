@@ -651,7 +651,7 @@ String.prototype.toLatin = function() {
     str = $this;
     if (matches) {
         matches.forEach(function(m) {
-            return str = str.replace(m, latinNumbers[farsiNumbers.indexOf(m)]);
+            return str.replace(m, latinNumbers[farsiNumbers.indexOf(m)]);
         });
     }
     return str.toLowerCase();
@@ -665,7 +665,7 @@ String.prototype.toFarsi = function() {
     str = $this;
     if (matches) {
         matches.forEach(function(m) {
-            return str = str.replace(m, farsiNumbers[parseInt(m)]);
+            return str.replace(m, farsiNumbers[parseInt(m)]);
         });
     }
     return str.toLowerCase();
